@@ -1,0 +1,4 @@
+[package]
+name = "earthinator"
+version = "0.1.0"
+authors = ["nikita"]
