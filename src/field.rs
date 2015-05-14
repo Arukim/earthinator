@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 pub struct Field{
     state: u32,
 }
@@ -10,38 +12,35 @@ impl Field{
     }
 }
 
-impl Clone for Field{
-    fn clone(&self) -> Field {
-        Field::new(self.state)
-    }
-}
-
+#[derive(Hash,Eq, PartialEq)]
+struct Point(u32,u32);
 
 pub struct Map{
-    lines: Vec<Vec<Field>>,
+    height: u32,
+    width: u32,
+    field: HashMap<Point,Field>,
 }
 
 impl Map {
     pub fn new(x: u32, y: u32) -> Map{
         let mut map = Map{
-            lines: Vec::new(),
+            height: y,
+            width: x,
+            field: HashMap::new(),
         };
 
-        let mut line = Vec::new();
-        for _ in 0..y {
-            line.push(Field::new(0));
-        }
-
-        for _ in 0..x{
-            map.lines.push(line.to_vec());
-        }
+        for i in 0..x {
+            for j in 0..y{
+                map.field.insert(Point(i,j), Field::new(0));
+            }
+        }        
         map
     }
 
     pub fn print(self){
-        for line in self.lines {
-            for field in line {
-                print!(" {}",field.state);
+        for i in 0..self.height {
+            for j in 0..self.width {
+                print!(" {}",self.field.get(&Point(i,j)).unwrap().state);
             }
             println!("");
         }
