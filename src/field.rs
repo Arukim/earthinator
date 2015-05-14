@@ -1,14 +1,20 @@
+extern crate rand;
 use std::collections::HashMap;
+use rand::Rng;
 
 pub struct Field{
-    state: u32,
+    state: u8,
 }
 
 impl Field{
-    pub fn new(state: u32) -> Field{
+    pub fn new(state: u8) -> Field{
         Field{
             state: state,
         }
+    }
+
+    pub fn set(&mut self, newstate: u8){
+        self.state = newstate;
     }
 }
 
@@ -18,7 +24,7 @@ struct Point(u32,u32);
 pub struct Map{
     height: u32,
     width: u32,
-    field: HashMap<Point,Field>,
+    fields: HashMap<Point,Field>,
 }
 
 impl Map {
@@ -26,23 +32,29 @@ impl Map {
         let mut map = Map{
             height: y,
             width: x,
-            field: HashMap::new(),
+            fields: HashMap::new(),
         };
 
         for i in 0..x {
             for j in 0..y{
-                map.field.insert(Point(i,j), Field::new(0));
+                map.fields.insert(Point(i,j),Field::new(0));
             }
         }        
         map
     }
 
-    pub fn print(self){
+    pub fn print(&self){
         for i in 0..self.height {
             for j in 0..self.width {
-                print!(" {}",self.field.get(&Point(i,j)).unwrap().state);
+                print!(" {}",self.fields.get(&Point(i,j)).unwrap().state);
             }
             println!("");
+        }
+    }
+
+    pub fn generate(&mut self){
+        for (_,field) in self.fields.iter_mut() {
+            field.state = rand::random::<u8>();
         }
     }
 }
