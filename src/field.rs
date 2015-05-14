@@ -1,6 +1,6 @@
 extern crate rand;
 use std::collections::HashMap;
-use rand::Rng;
+use rand::random;
 
 pub struct Field{
     state: u8,
@@ -54,7 +54,9 @@ impl Map {
 
     pub fn generate(&mut self){
         for (_,field) in self.fields.iter_mut() {
-            field.state = rand::random::<u8>();
+            if random::<u32>() % 2 == 1 {
+                field.state = 1;
+            }
         }
     }
 }
