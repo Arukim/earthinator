@@ -3,7 +3,8 @@ extern crate earthinator;
 use earthinator::field::Map;
 
 fn main(){
-    let mut map = Map::new(45,20);
+    let mut map = Map::new(200,150);
     map.generate();
-    map.print();
+    //map.print();
+    map.export();
 }

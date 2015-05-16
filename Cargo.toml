@@ -5,3 +5,5 @@ authors = ["nikita"]
 
 [dependencies]
 rand = "*"
+image = "*"
+

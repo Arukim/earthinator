@@ -1,4 +1,6 @@
 extern crate rand;
+extern crate image;
+
 pub mod field;
 
 #[test]
