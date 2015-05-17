@@ -27,10 +27,12 @@ pub struct Map{
     fields: HashMap<(u32,u32),Field>,
 }
 
-
-
+/// Params for algo func
 pub struct Params{
+    /// algo iteration count
     iterations: u32,
+    /// chances (0..100) to fill tile as earth
+    /// for tiles with 0,1,2,3,4 neighbours
     chances: (u32,u32,u32,u32,u32),
 }
 
@@ -138,17 +140,21 @@ impl Map {
             }
         }
     }
+
+    fn seed(&mut self, chance: u32){
+        // seed map
+        for (_,field) in self.fields.iter_mut() {
+            if random::<u32>() % 100 == chance {
+                field.state = 1;
+            }
+        }
+    }
     
     //TODO add target fill rate
     /// Generate map
     pub fn generate(&mut self){
-        
-        // seed map
-        for (_,field) in self.fields.iter_mut() {
-            if random::<u32>() % 100 == 1 {
-                field.state = 1;
-            }
-        }
+
+        self.seed(1);
 
         self.algo(Params{iterations: 25, chances: (0,20,40,50,80)});       
        
