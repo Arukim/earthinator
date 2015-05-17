@@ -27,6 +27,13 @@ pub struct Map{
     fields: HashMap<(u32,u32),Field>,
 }
 
+
+
+pub struct Params{
+    iterations: u32,
+    chances: (u32,u32,u32,u32,u32),
+}
+
 impl Map {
     pub fn new(x: u32, y: u32) -> Map{
         let mut map = Map{
@@ -61,14 +68,14 @@ impl Map {
 
         for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
             let color = if self.fields.get(&(x,y)).unwrap().state > 0
-            { 125 } else { 0 };
+            { [0,125,0] } else { [0,0,125] };
 
-            *pixel = image::Luma([color as u8]);
+            *pixel = image::Rgb(color);
         }
 
         let ref mut fout = File::create(&Path::new("out.png")).unwrap();
 
-        image::ImageLuma8(imgbuf).save(fout, image::PNG);
+        image::ImageRgb8(imgbuf).save(fout, image::PNG);
 
     }
     
@@ -97,7 +104,7 @@ impl Map {
     }
 
     /// Create neighbours map
-    fn calc_neighbours(&self,pre_map :&mut HashMap<(u32,u32),u32>){
+    fn calc_neighbours(&self,pre_map: &mut HashMap<(u32,u32),u32>){
         for i in 0..self.height {
             for j in 0..self.width {
                 let w = self.calc_weight((j,i));
@@ -106,19 +113,10 @@ impl Map {
         }        
     }
 
-    /// Generate map
-    pub fn generate(&mut self){
-        
-        // seed map
-        for (_,field) in self.fields.iter_mut() {
-            if random::<u32>() % 100 == 1 {
-                field.state = 1;
-            }
-        }
-        
+    fn algo(&mut self, params: Params){
         let mut neighbours = HashMap::<(u32,u32),u32>::new();
 
-        for _ in 0..20 {
+        for _ in 0..params.iterations {
             self.calc_neighbours(&mut neighbours);
 
             for (p, field) in self.fields.iter_mut() {
@@ -130,14 +128,29 @@ impl Map {
                 let chance = random::<u32>() % 100;
 
                 match *weight {
-                    //0 => if chance < 1 { field.state = 1 },
-                    1 => if chance < 10 { field.state = 1 },
-                    2 => if chance < 35 { field.state = 1 },
-                    3 => if chance < 45 { field.state = 1 },
-                    4 => if chance < 80 { field.state = 1 },
+                    0 => if chance < params.chances.0 { field.state = 1 },
+                    1 => if chance < params.chances.1 { field.state = 1 },
+                    2 => if chance < params.chances.2 { field.state = 1 },
+                    3 => if chance < params.chances.3 { field.state = 1 },
+                    4 => if chance < params.chances.4 { field.state = 1 },
                     _ => {},
                 }
             }
-        }            
+        }
+    }
+    
+    //TODO add target fill rate
+    /// Generate map
+    pub fn generate(&mut self){
+        
+        // seed map
+        for (_,field) in self.fields.iter_mut() {
+            if random::<u32>() % 100 == 1 {
+                field.state = 1;
+            }
+        }
+
+        self.algo(Params{iterations: 25, chances: (0,20,40,50,80)});       
+       
     }
 }
